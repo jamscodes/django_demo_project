@@ -6,13 +6,19 @@
     <title>Document</title>
 </head>
 <body>
-    {% if question %}
-        <h1>{{ question.question_text }}</h1>
-        <ul>
+    <form action="{% url 'polls:vote' question.id %}" method="post">
+        {% csrf_token %}
+        <fieldset>
+            <legend><h1>Vote in the "{{ question.question_text }}" poll</h1></legend>
+            {% if error_message %}<p><strong>{{ error_message }}</strong></p>{% endif %}
             {% for choice in question.choice_set.all %}
-                <li>{{ choice.choice_text }} | Votes: {{ choice.votes }}</li>
+                <div>
+                    <input type="radio" name="choice" id="choice-{{ forloop.counter }}" value="{{ choice.id }}">
+                    <label for="choice-{{ forloop.counter }}">{{ choice.choice_text }}</label>
+                </div>
             {% endfor %}
-        </ul>
-    {% endif %}
+        </fieldset>
+        <input type="submit" value="Vote">
+    </form>
 </body>
 </html>
