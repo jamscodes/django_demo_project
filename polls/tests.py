@@ -90,6 +90,27 @@ class QuestionIndexViewTests(TestCase):
             [past_question_2, past_question_1]
         )
 
+class QuestionDetailViewTests(TestCase):
+    def test_future_question(self) -> None:
+        """
+        Detail page should return 404 for a question whose
+        `pub_date` is in the future.
+        """
+        future_question = create_question(question_text="Future question", days=30)
+        response = self.client.get(reverse("polls:detail", args=(future_question.id,)))
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_past_question(self) -> None:
+        """
+        Detail page should return and render a question if
+        it's `pub_date` attribute is today or in the past.
+        """
+        past_question = create_question(question_text="Past question", days=-30)
+        response = self.client.get(reverse("polls:detail", args=(past_question.id,)))
+
+        self.assertContains(response, past_question.question_text)
+
 class QuestionModelTests(TestCase):
     def test_was_published_recently_with_future_question(self) -> None:
         """
